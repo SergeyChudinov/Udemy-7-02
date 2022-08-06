@@ -58,6 +58,14 @@ const Slider2 = (props) => {
         setAutoplay(autoplay => !autoplay)
     }
 
+    // const [state, setState] = useState({slide: 0, autoplay: false});
+    // const changeSlide = (i) => {
+    //     setState(state => ({...state, slide: state.slide + i}));
+    // }
+    // const toggleAutoplay = () => {
+    //     setState(state => ({...state, autoplay: !state.autoplay}))
+    // }
+
     return (
         <Container>
             <div className="slider w-50 m-auto">
