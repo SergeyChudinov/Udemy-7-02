@@ -1,9 +1,8 @@
-import {Component, useState} from 'react';
+import {Component, useState, useEffect} from 'react';
 import {Container} from 'react-bootstrap';
 import './App.css';
 
 class Slider extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -11,19 +10,22 @@ class Slider extends Component {
             slide: 0
         }
     }
-
+    // componentDidMount() {
+    //     document.title = `Slide: ${this.state.slide}`;
+    // }
+    // componentDidUpdate() {
+    //     document.title = `Slide: ${this.state.slide}`;
+    // }
     changeSlide = (i) => {
         this.setState(({slide}) => ({
             slide: slide + i
         }))
     }
-
     toggleAutoplay = () => {
         this.setState(({autoplay}) => ({
             autoplay: !autoplay
         }))
     }
-
     render() {
         return (
             <Container>
@@ -47,17 +49,26 @@ class Slider extends Component {
     }
 }
 
-
 const Slider2 = (props) => {
     const [slide, setSlide] = useState(0);
     const [autoplay, setAutoplay] = useState(false);
+    function logging() {
+        console.log('log!')
+    }
+    useEffect(() => {
+        console.log('effect');
+        document.title = `Slide: ${slide}`;
+        window.addEventListener('click', logging);
+        return () => {
+            window.removeEventListener('click', logging)
+        }
+    }, [slide])
     const changeSlide = (i) => {
         setSlide(slide => slide + i)
     }
     const toggleAutoplay = () => {
         setAutoplay(autoplay => !autoplay)
     }
-
     // const [state, setState] = useState({slide: 0, autoplay: false});
     // const changeSlide = (i) => {
     //     setState(state => ({...state, slide: state.slide + i}));
@@ -65,7 +76,6 @@ const Slider2 = (props) => {
     // const toggleAutoplay = () => {
     //     setState(state => ({...state, autoplay: !state.autoplay}))
     // }
-
     return (
         <Container>
             <div className="slider w-50 m-auto">
@@ -86,15 +96,15 @@ const Slider2 = (props) => {
         </Container>
     )
 }
-
-
 function App() {
-  return (
-        <>
-            <Slider/>
-            <Slider2/>
-        </>
-  );
+    const [slider, setSlider] = useState(true);
+    
+    return (
+            <>
+                <Slider/>
+                <button onClick={() => setSlider(!slider)}>Click</button>
+                {slider ? <Slider2/> : null}
+            </>
+    );
 }
-
 export default App;
