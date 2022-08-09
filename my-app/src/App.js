@@ -1,4 +1,4 @@
-import {Component, useState, useEffect, useCallback, useMemo} from 'react';
+import {Component, useState, useEffect, useCallback, useMemo, useRef} from 'react';
 import {Container} from 'react-bootstrap';
 import './App.css';
 
@@ -50,7 +50,7 @@ import './App.css';
 // }
 
 const countTotal = (num) => {
-    console.log('counting!');
+    // console.log('counting!');
     return num + 10
 }
 
@@ -75,7 +75,7 @@ const Slider2 = (props) => {
         setAutoplay(autoplay => !autoplay)
     }
     const getSomeImages = useCallback(() => {
-        console.log('fetching');
+        // console.log('fetching');
         return [
             'https://picsum.photos/id/106/200/200',
             'https://picsum.photos/id/24/200/200'
@@ -95,7 +95,7 @@ const Slider2 = (props) => {
         color: slide > 4 ? 'red' : 'black'
     }), [slide])
     useEffect(() => {
-        console.log('styles')
+        // console.log('styles')
     }, [style]);
     return (
         <Container>
@@ -118,6 +118,35 @@ const Slider2 = (props) => {
         </Container>
     )
 }
+const Form = () => {
+    const ref = useRef(null);
+    const [input, setInput] = useState('');
+    const focusFirstTI = () => {
+        if (!input) {
+            ref.current.focus()
+        }
+    }
+    useEffect(() => {
+        ref.current.focus()
+    })
+    const onInput = (event) => {
+        setInput(event.target.value)
+    }
+    return (
+        <form className="w-50 border mt-5 p-3 m-auto"
+        style={{'overflow': 'hidden', 
+        'position': 'relative'}}>
+            <div className="mb-3">
+                <label htmlFor="exampleFormControlInput1" className="form-label">Email address</label>
+                <input ref={ref} onInput={onInput} type="email" className="form-control" id="exampleFormControlInput1" placeholder="name@example.com"/>
+            </div>
+            <div className="mb-3">
+                <label htmlFor="exampleFormControlTextarea1" className="form-label">Example textarea</label>
+                <textarea onClick={focusFirstTI} className="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+        </form>
+    )
+}
 const Slide = ({getSomeImages}) => {
     const [images, setImages] = useState([]);
     useEffect(() => {
@@ -134,6 +163,7 @@ function App() {
     
     return (
             <>
+                <Form/>
                 {/* <Slider/> */}
                 <button onClick={() => setSlider(!slider)}>Click</button>
                 {slider ? <Slider2/> : null}
