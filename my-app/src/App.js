@@ -118,31 +118,44 @@ const Slider2 = (props) => {
         </Container>
     )
 }
+
+function useInputWithValidate(initialValue) {
+    const [value, setValue] = useState(initialValue);
+    const onChange = event => {
+        setValue(event.target.value);
+    }
+    const validateInput = () => {
+        return (value.search(/\d/) >= 0)
+    }
+    return {value, onChange, validateInput}
+}
 const Form = () => {
     const ref = useRef(null);
-    const [input, setInput] = useState('');
+    const input = useInputWithValidate('');
+    const textArea = useInputWithValidate('');
     const focusFirstTI = () => {
-        if (!input) {
+        if (!input.value) {
             ref.current.focus()
         }
     }
     useEffect(() => {
         ref.current.focus()
-    })
-    const onInput = (event) => {
-        setInput(event.target.value)
-    }
+    }, [])
+    const color = input.validateInput() ? 'text-danger' : null;
     return (
         <form className="w-50 border mt-5 p-3 m-auto"
-        style={{'overflow': 'hidden', 
-        'position': 'relative'}}>
+            style={{'overflow': 'hidden', 'position': 'relative'}}>
             <div className="mb-3">
-                <label htmlFor="exampleFormControlInput1" className="form-label">Email address</label>
-                <input ref={ref} onInput={onInput} type="email" className="form-control" id="exampleFormControlInput1" placeholder="name@example.com"/>
+                <input value={`${input.value} / ${textArea.value}`} type='text' className='form-control' readOnly/>
+                <label htmlFor="exampleFormControlInput1" className="form-label mt-3">Email address</label>
+                <input ref={ref} onInput={input.onChange} 
+                    value={input.value}
+                    type="email" className={`form-control ${color}`} 
+                    id="exampleFormControlInput1" placeholder="name@example.com"/>
             </div>
             <div className="mb-3">
                 <label htmlFor="exampleFormControlTextarea1" className="form-label">Example textarea</label>
-                <textarea onClick={focusFirstTI} className="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <textarea onClick={focusFirstTI} onInput={textArea.onChange} value={textArea.value} className="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
             </div>
         </form>
     )
