@@ -1,6 +1,49 @@
-import {Component, useState, useEffect, useCallback, useMemo, useRef} from 'react';
+import {Component, useState, useEffect, useCallback, useMemo, useRef, useReducer} from 'react';
 import {Container} from 'react-bootstrap';
 import './App.css';
+
+const Form = () => {
+    const ref = useRef(null);
+    const input = useInputWithValidate('');
+    const textArea = useInputWithValidate('');
+    const focusFirstTI = () => {
+        if (!input.value) {
+            ref.current.focus()
+        }
+    }
+    useEffect(() => {
+        ref.current.focus()
+    }, [])
+    const color = input.validateInput() ? 'text-danger' : null;
+    return (
+        <form className="w-50 border mt-5 p-3 m-auto"
+            style={{'overflow': 'hidden', 'position': 'relative'}}>
+            <div className="mb-3">
+                <input value={`${input.value} / ${textArea.value}`} type='text' className='form-control' readOnly/>
+                <label htmlFor="exampleFormControlInput1" className="form-label mt-3">Email address</label>
+                <input ref={ref} onInput={input.onChange} 
+                    value={input.value}
+                    type="email" className={`form-control ${color}`} 
+                    id="exampleFormControlInput1" placeholder="name@example.com"/>
+            </div>
+            <div className="mb-3">
+                <label htmlFor="exampleFormControlTextarea1" className="form-label">Example textarea</label>
+                <textarea onClick={focusFirstTI} onInput={textArea.onChange} value={textArea.value} className="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+        </form>
+    )
+}
+function useInputWithValidate(initialValue) {
+    const [value, setValue] = useState(initialValue);
+    const onChange = event => {
+        setValue(event.target.value);
+    }
+    const validateInput = () => {
+        return (value.search(/\d/) >= 0)
+    }
+    return {value, onChange, validateInput}
+}
+
 
 // class Slider extends Component {
 //     constructor(props) {
@@ -54,9 +97,28 @@ const countTotal = (num) => {
     return num + 10
 }
 
-const Slider2 = (props) => {
+function reducer (state, action) {
+    switch(action.type) {
+        case 'toggle':
+            return {autoplay: !state.autoplay};
+        case 'slow':
+            return {autoplay: 300}; 
+        case 'fast':
+            return {autoplay: 500};
+        case 'custom':
+            return {autoplay: action.payload}
+        default:
+            throw new Error();     
+    }
+}
+function init(initial) {
+    return {autoplay: initial}
+}
+const Slider2 = ({initial}) => {
     const [slide, setSlide] = useState(0);
-    const [autoplay, setAutoplay] = useState(false);
+    const [input, setInput] = useState(null);
+    // const [autoplay, setAutoplay] = useState(false);
+    const [state, dispatch] = useReducer(reducer, initial, init); //{autoplay: false}
     function logging() {
         // console.log('log!')
     }
@@ -71,9 +133,9 @@ const Slider2 = (props) => {
     const changeSlide = (i) => {
         setSlide(slide => slide + i)
     }
-    const toggleAutoplay = () => {
-        setAutoplay(autoplay => !autoplay)
-    }
+    // const toggleAutoplay = () => {
+    //     setAutoplay(autoplay => !autoplay)
+    // }
     const getSomeImages = useCallback(() => {
         // console.log('fetching');
         return [
@@ -97,11 +159,15 @@ const Slider2 = (props) => {
     useEffect(() => {
         // console.log('styles')
     }, [style]);
+    const onChange = (e) => {
+        setInput(input => e.target.value)
+    }
     return (
         <Container>
             <div className="slider w-50 m-auto">``
                 <Slide getSomeImages={getSomeImages}/>
-                <div className="text-center mt-5">Active slide {slide} <br/> {autoplay ? 'auto' : null}</div>
+                <div className="text-center mt-5">Active slide {slide} <br/> 
+                {state.autoplay ? 'auto' : null}</div>
                 <div style={style} className="text-center mt-5">Total slides: {total}</div>
                 <div className="buttons mt-3">
                     <button 
@@ -110,54 +176,28 @@ const Slider2 = (props) => {
                     <button 
                         className="btn btn-primary me-2"
                         onClick={() => changeSlide(1)}>+1</button>
+                    {/* <button 
+                        className="btn btn-primary me-2"
+                        onClick={toggleAutoplay}>toggle autoplay</button> */}
                     <button 
                         className="btn btn-primary me-2"
-                        onClick={toggleAutoplay}>toggle autoplay</button>
+                        onClick={() => dispatch({type: 'toggle'})}>toggle autoplay</button>
+                    <button 
+                        className="btn btn-primary me-2"
+                        onClick={() => dispatch({type: 'slow'})}>slow autoplay</button>
+                    <button 
+                        className="btn btn-primary me-2"
+                        onClick={() => dispatch({type: 'fast'})}>fast autoplay</button>
+                    <button 
+                        className="btn btn-primary me-2"
+                        onClick={(e) => dispatch({type: 'custom', payload: +e.target.textContent})}>1000</button> <br></br>
+                    <input onChange={onChange}></input>  
+                    <button 
+                        className="btn btn-primary me-2"
+                        onClick={() => dispatch({type: 'custom', payload: +input})}>Custom</button>
                 </div>
             </div>
         </Container>
-    )
-}
-
-function useInputWithValidate(initialValue) {
-    const [value, setValue] = useState(initialValue);
-    const onChange = event => {
-        setValue(event.target.value);
-    }
-    const validateInput = () => {
-        return (value.search(/\d/) >= 0)
-    }
-    return {value, onChange, validateInput}
-}
-const Form = () => {
-    const ref = useRef(null);
-    const input = useInputWithValidate('');
-    const textArea = useInputWithValidate('');
-    const focusFirstTI = () => {
-        if (!input.value) {
-            ref.current.focus()
-        }
-    }
-    useEffect(() => {
-        ref.current.focus()
-    }, [])
-    const color = input.validateInput() ? 'text-danger' : null;
-    return (
-        <form className="w-50 border mt-5 p-3 m-auto"
-            style={{'overflow': 'hidden', 'position': 'relative'}}>
-            <div className="mb-3">
-                <input value={`${input.value} / ${textArea.value}`} type='text' className='form-control' readOnly/>
-                <label htmlFor="exampleFormControlInput1" className="form-label mt-3">Email address</label>
-                <input ref={ref} onInput={input.onChange} 
-                    value={input.value}
-                    type="email" className={`form-control ${color}`} 
-                    id="exampleFormControlInput1" placeholder="name@example.com"/>
-            </div>
-            <div className="mb-3">
-                <label htmlFor="exampleFormControlTextarea1" className="form-label">Example textarea</label>
-                <textarea onClick={focusFirstTI} onInput={textArea.onChange} value={textArea.value} className="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-            </div>
-        </form>
     )
 }
 const Slide = ({getSomeImages}) => {
@@ -171,6 +211,7 @@ const Slide = ({getSomeImages}) => {
         </>
     )
 }
+
 function App() {
     const [slider, setSlider] = useState(true);
     
@@ -179,7 +220,7 @@ function App() {
                 <Form/>
                 {/* <Slider/> */}
                 <button onClick={() => setSlider(!slider)}>Click</button>
-                {slider ? <Slider2/> : null}
+                {slider ? <Slider2 initial={false}/> : null}
             </>
     );
 }
