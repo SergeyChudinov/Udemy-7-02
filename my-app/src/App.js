@@ -167,7 +167,8 @@ const Slider2 = ({initial}) => {
             <div className="slider w-50 m-auto">``
                 <Slide getSomeImages={getSomeImages}/>
                 <div className="text-center mt-5">Active slide {slide} <br/> 
-                {state.autoplay ? 'auto' : null}</div>
+                {state.autoplay ? (typeof(state.autoplay) === "boolean" ? "auto" : state.autoplay)
+                    : null}</div>
                 <div style={style} className="text-center mt-5">Total slides: {total}</div>
                 <div className="buttons mt-3">
                     <button 
